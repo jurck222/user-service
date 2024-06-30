@@ -1,7 +1,5 @@
 package org.task.userservice.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.InvalidClaimException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -81,24 +79,9 @@ public class AuthenticationService {
         throw new UsernameNotFoundException("User not found");
     }
 
-    public Role getUserRole(String token) {
-        var user = userRepository.findByEmail(jwtService.extractUsername(token));
-        if(user.isPresent()){
-            return user.get().getRole();
-        }
-        throw new UsernameNotFoundException("User not found");
-    }
-
-    public Boolean validate(String token, Role role) {
-        var user = userRepository.findByEmail(jwtService.extractUsername(token));
-        if(user.isPresent()){
-            return user.get().getRole() == role;
-        }
-        throw new InvalidParameterException("Wrong role");
-    }
-
-    public List<UserNameSurname> getDoctorsForService(MedicalService medicalService) {
-        var users = userRepository.findUsersByService(medicalService);
+    public List<UserNameSurname> getDoctorsForService(String medicalService) {
+        MedicalService service = MedicalService.fromString(medicalService);
+        var users = userRepository.findUsersByService(service);
         if(users.isPresent()){
             return users.get();
         }
